@@ -1,12 +1,13 @@
 package WWW::CBF;
+use warnings;
+use strict;
+
+use utf8::all;
 use URI;
 use Web::Scraper;
 eval 'use HTML::TreeBuilder::LibXML';
 
-use warnings;
-use strict;
-
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $cbf = scraper {
 	process 'tr', 'clubes[]' => scraper {
@@ -25,7 +26,7 @@ sub new {
 
 sub reload {
 	my $self = shift;
-	my $url = 'http://www.cbf.com.br/seriea/indexa.html';
+	my $url = 'http://www.cbf.com.br/competicoes/campeonato-brasileiro/serie-a/2012';
 
 	my $site = $cbf->scrape( URI->new($url) );
 
@@ -36,22 +37,16 @@ sub reload {
 		# get values from scraper
 		$self->{$pos} = {
 			clube    => $clube->{dados}->[1],
-		    pontos   => $clube->{dados}->[2],
-			jogos    => $clube->{dados}->[3],
-			vitorias => $clube->{dados}->[4],
-		    gp       => $clube->{dados}->[5],
-			gc       => $clube->{dados}->[6],
-			sg       => $clube->{dados}->[7],
-			ap       => $clube->{dados}->[8],
+			pontos   => $clube->{dados}->[3],
+			jogos    => $clube->{dados}->[4],
+			vitorias => $clube->{dados}->[5],
+			empates  => $clube->{dados}->[6],
+			derrotas => $clube->{dados}->[7],
+			gp       => $clube->{dados}->[8],
+			gc       => $clube->{dados}->[9],
+			sg       => $clube->{dados}->[10],
+			ap       => $clube->{dados}->[11],
 		};
-
-		# infer other values from championship rules
-		$self->{$pos}->{empates} = $self->{$pos}->{pontos}
-		                         - ($self->{$pos}->{vitorias} * 3)
-		                         ;
-		$self->{$pos}->{derrotas} = $self->{$pos}->{vitorias}
-		                          - $self->{$pos}->{empates}
-		                          ;
 	}
 
 	return $self;
@@ -67,13 +62,11 @@ sub pos {
 
 42;
 __END__
+=encoding utf8
+
 =head1 NAME
 
 WWW::CBF - Brazilian Football Championship status
-
-=head1 VERSION
-
-Version 0.01
 
 =head1 SYNOPSIS
 
